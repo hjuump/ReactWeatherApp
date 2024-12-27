@@ -21,6 +21,7 @@ DerivedData
 *.ipa
 *.xcuserstate
 **/.xcode.env.local
+*.xcworkspace
 
 # Android/IntelliJ
 #
@@ -39,6 +40,14 @@ local.properties
 node_modules/
 npm-debug.log
 yarn-error.log
+
+# React Native
+#
+.packager*
+*.bundle
+*.tmp
+*.temp
+*.lock
 
 # fastlane
 #
@@ -62,8 +71,14 @@ yarn-error.log
 # Temporary files created by Metro to check the health of the file watcher
 .metro-health-check*
 
-# testing
+# Metro cache
+*.cache
+*.metro
+*.bundle
+
+# Coverage and test
 /coverage
+*.tsbuildinfo
 
 # Yarn
 .yarn/*
@@ -72,3 +87,11 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Miscellaneous
+.env
+.env.*
+*.bak
+*.swp
+*.swo
+
