@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Text, StyleSheet, View, Dimensions, ScrollView} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
+import {API_KEY} from '@env';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
