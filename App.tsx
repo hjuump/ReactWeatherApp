@@ -62,6 +62,21 @@ function App(): React.JSX.Element {
     getWeather();
   }, []);
 
+  const getDayLabel = (timestamp: number) => {
+    const today = new Date();
+    const date = new Date(timestamp * 1000);
+
+    const isToday = today.toDateString() === date.toDateString();
+    const isTomorrow =
+      new Date(today.setDate(today.getDate() + 1)).toDateString() ===
+      date.toDateString();
+
+    if (isToday) return 'Today';
+    if (isTomorrow) return 'Tomorrow';
+
+    return `${date.getMonth() + 1}/${date.getDate()}`;
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.city}>
@@ -79,12 +94,19 @@ function App(): React.JSX.Element {
         ) : (
           days.map((day, index) => (
             <View key={index} style={styles.day}>
-              <Text style={styles.temperture}>
-                {Math.round(day.main.temp)}°C
-              </Text>
+              <Text style={styles.temperture}>{Math.round(day.main.temp)}</Text>
               <Text style={styles.description}>
                 {day.weather[0]?.main || 'N/A'}
               </Text>
+              <View style={styles.weatherInfo}>
+                <View style={styles.weatherInfo}>
+                  <Text style={styles.tinyText}>
+                    {`${getDayLabel(day.dt)} · ${
+                      day.weather[0]?.description || 'N/A'
+                    }`}
+                  </Text>
+                </View>
+              </View>
             </View>
           ))
         )}
@@ -114,11 +136,20 @@ const styles = StyleSheet.create({
   },
   temperture: {
     marginTop: 50,
-    marginBottom: -30,
+    marginBottom: -20,
     fontSize: 180,
+    fontWeight: 600,
   },
   description: {
     fontSize: 50,
+    fontWeight: 600,
+  },
+  weatherInfo: {
+    opacity: 0.6,
+  },
+  tinyText: {
+    fontSize: 17,
+    fontWeight: 600,
   },
 });
 
