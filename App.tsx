@@ -15,9 +15,9 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 function App(): React.JSX.Element {
   const [city, setCity] = useState('Loading...');
   const [ok, setOk] = useState(true);
-  const [days, setDays] = useState([]);
+  const [days, setDays] = useState<any[]>([]);
 
-  const getPermission = async () => {
+  const getWeather = async () => {
     const hasPermission = await Geolocation.requestAuthorization('whenInUse');
     if (hasPermission === 'granted') {
       Geolocation.getCurrentPosition(
@@ -28,7 +28,7 @@ function App(): React.JSX.Element {
           // OpenStreetMap API를 사용한 Reverse Geocoding
           try {
             const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=en`,
             );
             const data = await response.json();
             const cityName =
@@ -45,7 +45,7 @@ function App(): React.JSX.Element {
             `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`,
           );
           const json = await response.json();
-          setDays(json);
+          setDays(json.list || []);
         },
         error => {
           console.error(error);
@@ -59,7 +59,7 @@ function App(): React.JSX.Element {
   };
 
   useEffect(() => {
-    getPermission();
+    getWeather();
   }, []);
 
   return (
@@ -77,10 +77,16 @@ function App(): React.JSX.Element {
             <ActivityIndicator color="black" size="large" />
           </View>
         ) : (
-          <View style={styles.day}>
-            <Text style={styles.temperture}>-1</Text>
-            <Text style={styles.description}>Sunny</Text>
-          </View>
+          days.map((day, index) => (
+            <View key={index} style={styles.day}>
+              <Text style={styles.temperture}>
+                {Math.round(day.main.temp)}°C
+              </Text>
+              <Text style={styles.description}>
+                {day.weather[0]?.main || 'N/A'}
+              </Text>
+            </View>
+          ))
         )}
       </ScrollView>
     </View>
