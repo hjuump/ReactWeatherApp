@@ -1,5 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {Text, StyleSheet, View, Dimensions, ScrollView} from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  View,
+  Dimensions,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import {API_KEY} from '@env';
 
@@ -8,6 +15,8 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 function App(): React.JSX.Element {
   const [city, setCity] = useState('Loading...');
   const [ok, setOk] = useState(true);
+  const [days, setDays] = useState([]);
+
   const getPermission = async () => {
     const hasPermission = await Geolocation.requestAuthorization('whenInUse');
     if (hasPermission === 'granted') {
@@ -32,6 +41,11 @@ function App(): React.JSX.Element {
             console.error('Reverse geocoding failed:', error);
             setCity('Error fetching location');
           }
+          const response = await fetch(
+            `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`,
+          );
+          const json = await response.json();
+          setDays(json);
         },
         error => {
           console.error(error);
@@ -58,26 +72,16 @@ function App(): React.JSX.Element {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.weather}>
-        <View style={styles.day}>
-          <Text style={styles.temperture}>-1</Text>
-          <Text style={styles.description}>Sunny</Text>
-        </View>
-        <View style={styles.day}>
-          <Text style={styles.temperture}>-1</Text>
-          <Text style={styles.description}>Sunny</Text>
-        </View>
-        <View style={styles.day}>
-          <Text style={styles.temperture}>-1</Text>
-          <Text style={styles.description}>Sunny</Text>
-        </View>
-        <View style={styles.day}>
-          <Text style={styles.temperture}>-1</Text>
-          <Text style={styles.description}>Sunny</Text>
-        </View>
-        <View style={styles.day}>
-          <Text style={styles.temperture}>-1</Text>
-          <Text style={styles.description}>Sunny</Text>
-        </View>
+        {days.length === 0 ? (
+          <View style={styles.day}>
+            <ActivityIndicator color="black" size="large" />
+          </View>
+        ) : (
+          <View style={styles.day}>
+            <Text style={styles.temperture}>-1</Text>
+            <Text style={styles.description}>Sunny</Text>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -86,6 +90,7 @@ function App(): React.JSX.Element {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'tomato',
   },
   city: {
     flex: 1,
