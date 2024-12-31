@@ -6,8 +6,10 @@ import {
   Dimensions,
   ScrollView,
   ActivityIndicator,
+  StatusBar,
 } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import {API_KEY} from '@env';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
@@ -17,13 +19,22 @@ function App(): React.JSX.Element {
   const [ok, setOk] = useState(true);
   const [days, setDays] = useState<any[]>([]);
 
+  const icons: Record<string, string> = {
+    Clouds: 'cloud',
+    Clear: 'wb-sunny',
+    Atmosphere: 'blur-on',
+    Snow: 'ac-unit',
+    Rain: 'cloud-rain',
+    Drizzle: 'grain',
+    Thunderstorm: 'flash-on',
+  };
+
   const getWeather = async () => {
     const hasPermission = await Geolocation.requestAuthorization('whenInUse');
     if (hasPermission === 'granted') {
       Geolocation.getCurrentPosition(
         async position => {
           const {latitude, longitude} = position.coords;
-          console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
 
           // OpenStreetMap API를 사용한 Reverse Geocoding
           try {
@@ -79,6 +90,7 @@ function App(): React.JSX.Element {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="tomato" />{' '}
       <View style={styles.city}>
         <Text style={styles.cityName}>{city}</Text>
       </View>
@@ -94,18 +106,26 @@ function App(): React.JSX.Element {
         ) : (
           days.map((day, index) => (
             <View key={index} style={styles.day}>
-              <Text style={styles.temperture}>{Math.round(day.main.temp)}</Text>
+              <View style={styles.day_row}>
+                <Text style={styles.temperture}>
+                  {Math.round(day.main.temp)}
+                </Text>
+                <Icon
+                  name={icons[day.weather[0]?.main] || 'help-outline'}
+                  size={44}
+                  color="black"
+                />
+              </View>
+
               <Text style={styles.description}>
                 {day.weather[0]?.main || 'N/A'}
               </Text>
               <View style={styles.weatherInfo}>
-                <View style={styles.weatherInfo}>
-                  <Text style={styles.tinyText}>
-                    {`${getDayLabel(day.dt)} · ${
-                      day.weather[0]?.description || 'N/A'
-                    }`}
-                  </Text>
-                </View>
+                <Text style={styles.tinyText}>
+                  {`${getDayLabel(day.dt)} · ${
+                    day.weather[0]?.description || 'N/A'
+                  }`}
+                </Text>
               </View>
             </View>
           ))
@@ -132,7 +152,6 @@ const styles = StyleSheet.create({
   weather: {},
   day: {
     width: SCREEN_WIDTH,
-    alignItems: 'center',
   },
   temperture: {
     marginTop: 50,
@@ -143,6 +162,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 50,
     fontWeight: 600,
+    paddingLeft: 30,
   },
   weatherInfo: {
     opacity: 0.6,
@@ -150,6 +170,13 @@ const styles = StyleSheet.create({
   tinyText: {
     fontSize: 17,
     fontWeight: 600,
+    paddingLeft: 30,
+  },
+  day_row: {
+    paddingHorizontal: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 });
 
